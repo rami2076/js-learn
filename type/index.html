@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<title>JavaScript テスト</title>
+</head>
+
+<body>
+    <h1>Types</h1>
+
+    <h2>string 文字列</h2>
+    <script type="text/javascript" src="./js/string.js"></script>
+
+    <h2>int　数値</h2>
+    <script type="text/javascript" src="./js/number.js"></script>
+
+    <h2>boolean 論理値</h2>
+    <script type="text/javascript" src="./js/boolean.js"></script>
+
+    <h2>object オブジェクト</h2>
+    <script type="text/javascript" src="./js/object.js"></script>
+
+</body></html>
+
+
+
+<!--
+
+型について
+
+変数は型を持たない。
+値は型を持つ。
+値の型のことをデータ型という。
+
+データ型はプリミティブ型とobjectの二つに分かれる。
+プリミティブ型は一度作成したら変更できないイミュータブルな特性を持つ。
+obejctは作成後も値自体を変更できるため、ミュータブルな特性を持つ。
+objectは参照型のデータ。
+
+プリミティブ型の代表
+・真偽値
+・数値
+・文字列
+・undefined
+・null　　　->typeof nullとした場合、objectとなるのは歴史的経緯があるバグ。
+・シンボル
+
+オブジェクトの代表 ->typeofでの型検査時にはobejctの種類の区別はされず、すべて同じobejctという判定となる。
+・プリミティブ型以外のデータ
+・オブジェクト、配列、関数、正規表現、日付型など
+
+
+型は(typeof 値または変数)で検査可能。
+
+
+
+-->

@@ -1,0 +1,32 @@
+<!-- HTML内に分散して記述されたscriptの扱いについて -->
+<p>XHTMLの文1</p>
+
+<script type="text/javascript">
+
+</script>
+
+<p>XHTMLの文2</p>
+
+<script type="text/javascript">
+document.write("<p>スクリプトの文1</p>");
+</script>
+
+<p>XHTMLの文3</p>
+
+
+
+<!-- 
+上記のように分散されたscriptは実行時にHTMLページ単位で一つのスクリプトにまとめられる。
+変数のスコープはHTMLページ単位となる。
+上記のコードが実行された場合、scriptは下記のようにまとめられる。
+
+<script type="text/javascript">
+document.write("<p>スクリプトの文1</p>");
+document.write("<p>スクリプトの文1</p>");
+</script>
+
+-->
+
+
+
+<!-- 下記のようにファイルが分割された場合においてもスコープはファイル単位でまとめられる。 -->
