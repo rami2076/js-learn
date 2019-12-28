@@ -191,24 +191,55 @@ const obj = {
     "key2": "value2"
 };
 // プロパティ名`key`の値を、変数`key`として定義する
-const { key1, key2} = obj;
+const {
+    key1,
+    key2
+} = obj;
 console.log(key1); // => "value"
 console.log(key2); // => "value"
 //複数のプロパティを同時抽出可能。
 
 
 //三項演算子
-console.log("3つの値");
+console.log("三項演算子");
+/*
+3つの項を受け取る演算子なので三項演算子と呼ぶ。
+オペランド1　?　オペランド2 : オペランド3;
+条件式 ? Trueの場合の式 : Falseの場合の式;
+上記の順に記述する。
+*/
+//#例
+const valueA = true ? "A" : "B";
+console.log(valueA);
+const valueB = valueA === "A" ? "B" : "C";
+console.log(valueB);
 
-//数値　単項プラス演算子　
-console.log();
-//数値　単項プラス演算子　
-console.log();
-//数値　単項プラス演算子　
-console.log();
-//数値　単項プラス演算子　
-console.log();
-//数値　単項プラス演算子　
-console.log();
-//数値　単項プラス演算子　
-console.log();
+function addPrefix(text, prefix) {
+    //`prefix`は"デフォルト:"を付与。
+    const pre = typeof prefix === "string" ? prefix : "デフォルト:"
+    return pre + text;
+}
+console.log(addPrefix("文字列"));
+console.log(addPrefix("文字列", "カスタム"));
+//if文を使う場合は、定数キーワードconstを使用できない。
+
+
+
+console.log("論理演算子シリーズ")
+//boolean and演算子
+const x = true;
+const y = false;
+//x -> y の順で評価。
+console.log(x && y); //=> false
+//jsは短絡評価なので
+//xの評価は実施しない。
+console.log(y && x); //=> false
+
+//boolean OR演算子
+//短絡評価なので、yは評価されない。
+console.log(x || y);
+//y -> x の順で評価される。　
+console.log(y || x);
+
+//boolean　NOT演算子
+console.log(!x);
