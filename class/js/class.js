@@ -500,4 +500,8 @@
     console.log(array.length); // => 5
     console.log(array.first); // => 1
     console.log(array.last); // => 5
+    
+        
+    //ビルトインオブジェクトもカスタムクラスと同じように継承が可能。
+
 }
