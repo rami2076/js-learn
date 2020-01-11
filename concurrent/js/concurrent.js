@@ -863,4 +863,265 @@
 }
 
 
+//since ES2017 Async Function  IEは未対応。
+{
 
+    /*
+    Promiseの読みづらさを解消するために構文レベルで非同期処理を扱えるように
+    Async Functionが導入された。
+    */
+
+    {
+        async function doAsync() {
+            return "値";
+        }
+        // doAsync関数はPromiseを返す
+        doAsync().then(value => {
+            console.log(value); // => "値"
+        });
+    }
+
+    /*
+    キーワードasyncを付与した場合thenableな関数オブジェクトを定義できる仕組みが採用された。
+    async function構文により読みやすさ、コードの簡潔さが向上。
+    分かりやすく、簡単な記述で非同期処理を記述できるようになった。
+    */
+
+
+    //以下のようなPromiseオブジェクトで書いた場合と同じ意味となる。
+    {
+        // 通常の関数でPromiseインスタンスを返している
+        function doAsync() {
+            return Promise.resolve("値");
+        }
+        doAsync().then(value => {
+            console.log(value); // => "値"
+        });
+    }
+
+}
+
+
+//Async Functionの定義
+{
+
+    /*
+    AsyncFunctionは　定義時asyncを付けるだけでよい。
+    */
+
+
+    // 関数宣言のAsync Function版
+    async function fn1() {}
+    // 関数式のAsync Function版
+    const fn2 = async function () {};
+    // Arrow FunctionのAsync Function版
+    const fn3 = async () => {};
+    // メソッドの短縮記法のAsync Function版
+    const obj = {
+        async method() {}
+    };
+
+
+    //Async Functionは
+    /*
+    必ずPromiseを返却する。
+    await式が利用できる。
+    */
+}
+
+//Async FunctionがPromiseを返却しているか検証。
+{
+
+    /*
+    Async Functionは値をreturnした場合、その返り値をもつFulfilledなPromiseを返す
+    Async FunctionがPromiseをreturnした場合、その返り値のPromiseをそのまま返す
+    Async Function内で例外が発生した場合は、そのエラーをもつRejectedなPromiseを返す
+    */
+
+    // 1. resolveFnは値を返している
+    // 何もreturnしていない場合はundefinedを返したのと同じ扱いとなる
+    async function resolveFn() {
+        return "返り値";
+    }
+    resolveFn().then(value => {
+        console.log(value); // => "返り値"
+    });
+
+    // 2. rejectFnはPromiseインスタンスを返している
+    async function rejectFn() {
+        return Promise.reject(new Error("エラーメッセージ"));
+    }
+
+    // rejectFnはRejectedなPromiseを返すのでcatchできる
+    rejectFn().catch(error => {
+        console.log(error.message); // => "エラーメッセージ"
+    });
+
+    // 3. exceptionFnは例外を投げている
+    async function exceptionFn() {
+        throw new Error("例外が発生しました");
+        // 例外が発生したため、この行は実行されません
+    }
+
+    // Async Functionで例外が発生するとRejectedなPromiseが返される
+    exceptionFn().catch(error => {
+        console.log(error.message); // => "例外が発生しました"
+    });
+
+}
+
+
+//How to use await?
+{
+
+    /*
+    awaitは処理が非同期な関数を同期処理として扱うためのキーワード。
+    await PromiseInstanceで実行できる。
+    awaitを付けると戻り値がある場合、Promiseでラップされた値を取り出してくれる。
+    */
+
+    // async functionは必ずPromiseを返す
+    async function doAsync() {
+        // 非同期処理
+    }
+    async function asyncMain() {
+        // doAsyncの非同期処理が完了するまでまつ
+        await doAsync();
+        // 次の行はdoAsyncの非同期処理が完了されるまで実行されない
+        console.log("この行は非同期処理が完了後に実行される");
+    }
+
+    /*ポイント*/
+    //awaitはasync function内でしか実行できない。
+}
+
+
+
+//Promise with return value with await
+{
+    //async/awaitを使用した場合
+    {
+        async function asyncMain() {
+            const value = await Promise.resolve(98);
+            console.log(value); //逐次処理のように記述することが可能。
+        }
+        asyncMain();
+    }
+
+    //async/awaitを使用しない場合
+    {
+        function asyncMain() {
+            return Promise.resolve(103)
+                .then((v) => console.log(v));
+        }
+        asyncMain();
+    }
+}
+
+
+//async/await rejectedの場合
+{
+    async function doMain() {
+        const value = await Promise.reject(new Error("ここで例外が取り出されるためこの行までしか評価されない。例外はスローされるが、Promiseに包まれる。"))
+    }
+
+    doMain().catch(error => console.log(error.message));
+}
+
+
+//async/await and try catch
+{
+
+    /*
+    async function 内でawaitした場合、try-catch構文が利用できる。
+    */
+
+    async function doMain() {
+        try {
+            const value = await Promise.reject(new Error("async/await and try catch"));
+        } catch (error) {
+            console.log(error.message);
+
+        }
+    }
+
+
+    //トライキャッチすることでasync functionがfulfilled　promiseとなっているため下記の処理は実行されない。
+    doMain().catch(error => console.log("この処理は呼ばれない" + error.message));
+}
+
+
+
+
+//async/awaitはみやすいのか？
+{
+    //not use async/await
+    {
+
+        function dummyFetch(path) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (path.startsWith("/resource")) {
+                        resolve({
+                            body: `Response body of ${path}`
+                        });
+                    } else {
+                        reject(new Error("NOT FOUND"));
+                    }
+                }, 1000 * Math.random());
+            });
+        }
+        // リソースAとリソースBを順番に取得する
+        function fetchAB() {
+            const results = [];
+            return dummyFetch("/resource/A").then(response => {
+                results.push(response.body);
+                return dummyFetch("/resource/B");
+            }).then(response => {
+                results.push(response.body);
+                return results;
+            });
+        }
+        // リソースを取得して出力する
+        fetchAB().then((results) => {
+            console.log(results); // => ["Response body of /resource/A", "Response body of /resource/B"]
+        });
+    }
+
+    //use async/await
+    {
+        function dummyFetch(path) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (path.startsWith("/resource")) {
+                        resolve({
+                            body: `Response body of ${path}`
+                        });
+                    } else {
+                        reject(new Error("NOT FOUND"));
+                    }
+                }, 1000 * Math.random());
+            });
+        }
+        // リソースAとリソースBを順番に取得する
+        async function fetchAB() {
+            const results = [];
+            const responseA = await dummyFetch("/resource/A");
+            results.push(responseA.body);
+            const responseB = await dummyFetch("/resource/B");
+            results.push(responseB.body);
+            return results;
+        }
+        // リソースを取得して出力する
+        fetchAB().then((results) => {
+            console.log(results); // => ["Response body of /resource/A", "Response body of /resource/B"]
+        });
+    }
+
+
+
+    /*
+    逐次的に記述できる分読みやすさが向上している。
+    ネストとした処理が多い分、認知負荷が大きいことが改めてわかる。
+    */
+}
