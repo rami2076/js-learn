@@ -1125,3 +1125,177 @@
     ネストとした処理が多い分、認知負荷が大きいことが改めてわかる。
     */
 }
+
+
+//次の単元
+{
+    /*
+    Async Functionと他の構文との組み合わせをすることでより強力に実践的な非同期処理の記述が可能となる。
+    */
+}
+
+
+//Async Functionと反復処理の組み合わせ
+{
+    /*
+    反復処理との組み合わせ
+    逐次処理
+    */
+    {
+
+
+        //Task
+        function dummyFetch(path) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (path.startsWith("/resource")) {
+                        resolve({
+                            body: `Response body of ${path}`
+                        });
+                    } else {
+                        reject(new Error("NOT FOUND"));
+                    }
+                }, 1000 * Math.random());
+            });
+        }
+
+
+        //TaskExecutor
+        // 複数のリソースを順番に取得する
+        async function fetchResources(resources) {
+            const results = [];
+            for (let i = 0; i < resources.length; i++) {
+                const resource = resources[i];
+                // ループ内で非同期処理の完了を待っている
+                const response = await dummyFetch(resource);
+                //awaitを使用しているため並行処理を行うプロセス(スレッド?)の振る舞いが非効率になる。
+                //順番に意味がある場合は、このように記述する必要がある。
+                results.push(response.body);
+            }
+            // 反復処理が全て終わったら結果を返す(返り値となるPromiseを`results`でresolveする)
+            return results;
+        }
+
+
+
+        //Resources
+        // 取得したいリソースのパス配列
+        const resources = [
+            "/resource/A",
+            "/resource/B"
+        ];
+
+        //実コード
+        // リソースを取得して出力する
+        fetchResources(resources).then((results) => {
+            console.log(results); // => ["Response body of /resource/A", "Response body of /resource/B"]
+        });
+    }
+}
+
+//処理を同時に実行してすべての処理実行後に結果を取得
+{
+    function dummyFetch(path) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (path.startsWith("/resource")) {
+                    resolve({
+                        body: `Response body of ${path}`
+                    });
+                } else {
+                    reject(new Error("NOT FOUND"));
+                }
+            }, 1000 * Math.random());
+        });
+    }
+    // 複数のリソースをまとめて取得する
+    async function fetchAllResources(resources) {
+        // リソースを同時に取得する
+        const promises = resources.map(function (resource) {
+            return dummyFetch(resource);
+        });
+        // すべてのリソースが取得できるまで待つ
+        // Promise.allは [ResponseA, ResponseB] のように結果が配列となる
+        const responses = await Promise.all(promises);
+        // 取得した結果からレスポンスのボディだけを取り出す
+        return responses.map((response) => {
+            return response.body;
+        });
+    }
+    const resources = [
+    "/resource/A",
+    "/resource/B"
+];
+    // リソースを取得して出力する
+    fetchAllResources(resources).then((results) => {
+        console.log(results); // => ["Response body of /resource/A", "Response body of /resource/B"]
+    });
+}
+
+
+
+//awaitはasync外の処理まで停止しない。
+{
+    async function asyncMain() {
+        // 中でawaitしても、Async Functionの外側の処理まで止まるわけではない
+        await new Promise((resolve) => {
+            setTimeout(resolve, 16);
+        });
+    };
+    console.log("1. asyncMain関数を呼び出します");
+    // Async Functionは外から見れば単なるPromiseを返す関数
+    asyncMain().then(() => {
+        console.log("3. asyncMain関数が完了しました");
+    });
+    // Async Functionの外側の処理はそのまま進む
+    console.log("2. asyncMain関数外では、次の行が同期的に呼び出される");
+
+
+
+}
+
+
+
+//async function bad pattern 
+{
+    function dummyFetch(path) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (path.startsWith("/resource")) {
+                    resolve({
+                        body: `Response body of ${path}`
+                    });
+                } else {
+                    reject(new Error("NOT FOUND"));
+                }
+            }, 1000 * Math.random());
+        });
+    }
+    // リソースを順番に取得する
+    async function fetchResources(resources) {
+        const results = [];
+        // コールバック関数をAsync Functionに変更
+        resources.forEach(async function (resource) {
+            // await式を利用できるようになった
+            const response = await dummyFetch(resource);
+            results.push(response.body);
+        });
+        return results;
+    }
+    const resources = ["/resource/A", "/resource/B"];
+    // リソースを取得して出力する
+    fetchResources(resources).then((results) => {
+        // しかし、resultsは空になってしまう
+        console.log(results); // => []
+    });
+
+
+    /*
+    async function 内で　async functionを使用する場合、awaitが正しく差し込まれていることを確認すること。
+    正しく差し込まれていない場合、skip処理となっている場合があるので気を付ける。
+    
+    
+    上記を解決するには、コールバック関数を使わない
+    使う場合は、複数の非同期処理を一つにまとめた処理を使用することでawaitを使わず記述可能。
+    */
+}
